@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Lock, Database, Server, FileText, Users, BarChart2, AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   const [activeDomain, setActiveDomain] = useState('');
@@ -103,13 +104,14 @@ const LandingPage = () => {
             </p>
             
             <div className="pt-4 flex flex-wrap gap-4">
-              <button
+              <Link
+                to={'/CompanyList'}
                 onClick={() => setShowData(!showData)}
                 className="py-3 px-8 rounded-lg bg-blue-600 hover:bg-blue-700 font-medium flex items-center gap-2 transition-colors"
               >
                 <Database className="w-5 h-5" />
                 {showData ? "Hide Companies" : "View Companies"}
-              </button>
+              </Link>
               
               <button
                 className="py-3 px-8 rounded-lg bg-transparent border border-blue-500 hover:bg-blue-900/20 font-medium flex items-center gap-2 transition-colors"
