@@ -10,18 +10,14 @@ function CompanyData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Google Sheets API endpoint - keeping the same logic
         const sheetId = "1oWP2J3D4esXawykJs-cTFq1VjMkFanMiGlQybAWMQsk";
         const tabId = "1942759132";
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${tabId}`;
 
         const response = await fetch(url);
         const text = await response.text();
-
-        // Parse the JSON-like response from Google Sheets - maintaining same logic
         const jsonData = JSON.parse(text.substring(47).slice(0, -2));
 
-        // Extract column headers and company data - maintaining same logic
         const headers = jsonData.table.cols.map((col) => col.label);
         const rows = jsonData.table.rows.map((row) => {
           const companyData = {};
@@ -33,7 +29,6 @@ function CompanyData() {
           return companyData;
         });
 
-        // Find the specific company - maintaining same logic
         const foundCompany = rows.find(
           (comp) => decodeURIComponent(companyName) === comp["Company Name"]
         );
@@ -53,6 +48,58 @@ function CompanyData() {
 
     fetchData();
   }, [companyName]);
+
+  // Function to parse and render social media links
+  const renderSocialMediaLinks = (socialMediaString) => {
+    if (!socialMediaString) return null;
+
+    // Regular expression to match social media platform and URL
+    const linkPattern = /(LinkedIn|Twitter|Facebook):\s*(https?:\/\/[^\s]+)/gi;
+    const matches = [...socialMediaString.matchAll(linkPattern)];
+
+    if (matches.length === 0) return <span>{socialMediaString}</span>;
+
+    const elements = [];
+    let lastIndex = 0;
+
+    matches.forEach((match, index) => {
+      const [fullMatch, platform, url] = match;
+      const startIndex = match.index;
+
+      // Add text before the match if any
+      if (startIndex > lastIndex) {
+        elements.push(
+          <span key={`text-${index}`}>
+            {socialMediaString.slice(lastIndex, startIndex)}
+          </span>
+        );
+      }
+
+      // Add the clickable link
+      elements.push(
+        <a
+          key={`link-${index}`}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-emerald-400 hover:text-emerald-300 transition-colors hover:underline"
+        >
+          {platform}
+        </a>
+      );
+
+      lastIndex = startIndex + fullMatch.length;
+    });
+
+    // Add remaining text after the last match
+    if (lastIndex < socialMediaString.length) {
+      elements.push(
+        <span key="text-end">{socialMediaString.slice(lastIndex)}</span>
+      );
+    }
+
+    return <div className="space-y-2">{elements}</div>;
+  };
 
   if (loading)
     return (
@@ -112,8 +159,6 @@ function CompanyData() {
 
   if (!company) return null;
 
-   // New attribute groups
-   // New attribute groups
   const generalInfoGroup = [
     "Industry",
     "Headquarters",
@@ -172,7 +217,6 @@ function CompanyData() {
         </Link>
 
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-gray-700/50 relative">
-          {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full filter blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl"></div>
 
@@ -221,7 +265,6 @@ function CompanyData() {
             </div>
           </div>
 
-          {/* About Section */}
           <div className="p-8">
             {company["Company Description"] && (
               <div className="mb-10 bg-gray-800/40 p-6 rounded-2xl border border-gray-700/50 backdrop-blur-sm">
@@ -231,14 +274,13 @@ function CompanyData() {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
                       d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
+                    />
                   </svg>
                   About
                 </h2>
@@ -248,14 +290,22 @@ function CompanyData() {
               </div>
             )}
 
-            {/* Information Groups */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-              {/* General Information */}
               <div className="bg-gradient-to-r from-emerald-600/60 to-blue-600/60 p-6 rounded-2xl border border-gray-700/50 backdrop-blur-sm transition-colors duration-300">
                 <h2 className="text-xl font-semibold text-white mb-5 flex items-center">
                   <div className="bg-gray-700/50 p-1.5 rounded-lg mr-3">
-                    <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <svg
+                      className="w-5 h-5 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
                     </svg>
                   </div>
                   General Information
@@ -265,19 +315,32 @@ function CompanyData() {
                     (key) =>
                       company[key] && (
                         <div key={key} className="flex flex-col">
-                          <span className="text-gray-400 text-sm font-medium mb-1">{key}</span>
-                          <span className="text-white font-medium text-lg">{company[key]}</span>
+                          <span className="text-gray-400 text-sm font-medium mb-1">
+                            {key}
+                          </span>
+                          <span className="text-white font-medium text-lg">
+                            {company[key]}
+                          </span>
                         </div>
                       )
                   )}
                 </div>
               </div>
-              {/* Financial Information */}
               <div className="bg-gradient-to-r from-emerald-600/60 to-blue-600/60 p-6 rounded-2xl border border-gray-700/50 backdrop-blur-sm transition-colors duration-300">
                 <h2 className="text-xl font-semibold text-white mb-5 flex items-center">
                   <div className="bg-gray-700/50 p-1.5 rounded-lg mr-3">
-                    <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <svg
+                      className="w-5 h-5 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
                     </svg>
                   </div>
                   Financial Information
@@ -287,9 +350,12 @@ function CompanyData() {
                     (key) =>
                       company[key] && (
                         <div key={key} className="flex flex-col">
-                          <span className="text-gray-400 text-sm font-medium mb-1">{key}</span>
+                          <span className="text-gray-400 text-sm font-medium mb-1">
+                            {key}
+                          </span>
                           <span className="text-white font-medium text-lg">
-                            {typeof company[key] === "string" && company[key].includes("$")
+                            {typeof company[key] === "string" &&
+                            company[key].includes("$")
                               ? company[key]
                               : `$${company[key]}`}
                           </span>
@@ -300,34 +366,56 @@ function CompanyData() {
               </div>
             </div>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* AR/IoT Information */}
               <div className="bg-gradient-to-r from-emerald-600/60 to-blue-600/60 p-6 rounded-2xl border border-gray-700/50 backdrop-blur-sm transition-colors duration-300">
                 <h2 className="text-xl font-semibold text-white mb-5 flex items-center">
                   <div className="bg-gray-700/50 p-1.5 rounded-lg mr-3">
-                    <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    <svg
+                      className="w-5 h-5 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                      />
                     </svg>
                   </div>
-                    Security Capabilities
+                  Security Capabilities
                 </h2>
                 <div className="space-y-5">
                   {securityCapabilities.map(
                     (key) =>
                       company[key] && (
                         <div key={key} className="flex flex-col">
-                          <span className="text-gray-400 text-sm font-medium mb-1">{key}</span>
-                          <span className="text-white font-medium text-lg">{company[key]}</span>
+                          <span className="text-gray-400 text-sm font-medium mb-1">
+                            {key}
+                          </span>
+                          <span className="text-white font-medium text-lg">
+                            {company[key]}
+                          </span>
                         </div>
                       )
                   )}
                 </div>
               </div>
-              {/* People & Contacts */}
               <div className="bg-gradient-to-r from-emerald-600/60 to-blue-600/60 p-6 rounded-2xl border border-gray-700/50 backdrop-blur-sm transition-colors duration-300">
                 <h2 className="text-xl font-semibold text-white mb-5 flex items-center">
                   <div className="bg-gray-700/50 p-1.5 rounded-lg mr-3">
-                    <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    <svg
+                      className="w-5 h-5 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                      />
                     </svg>
                   </div>
                   People & Contacts
@@ -337,23 +425,25 @@ function CompanyData() {
                     (key) =>
                       company[key] && (
                         <div key={key} className="flex flex-col">
-                          <span className="text-gray-400 text-sm font-medium mb-2">{key}</span>
+                          <span className="text-gray-400 text-sm font-medium mb-2">
+                            {key}
+                          </span>
                           <span className="text-white">
-                            {key === "Founders & LinkedIn URLs" &&
-                            company[key].includes("LinkedIn:")
-                              ? (
-                                <div
-                                  dangerouslySetInnerHTML={{
-                                    __html: company[key].replace(
-                                      /(https:\/\/www\.linkedin\.com\/[^\s,]+)/g,
-                                      '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:text-emerald-300 transition-colors hover:underline">LinkedIn Profile</a>'
-                                    ),
-                                  }}
-                                />
-                              )
-                              : (
-                                company[key]
-                              )}
+                            {key === "Social Media Links" ? (
+                              renderSocialMediaLinks(company[key])
+                            ) : key === "Founders & LinkedIn URLs" &&
+                              company[key].includes("LinkedIn:") ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: company[key].replace(
+                                    /(https:\/\/www\.linkedin\.com\/[^\s,]+)/g,
+                                    '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:text-emerald-300 transition-colors hover:underline">LinkedIn Profile</a>'
+                                  ),
+                                }}
+                              />
+                            ) : (
+                              company[key]
+                            )}
                           </span>
                         </div>
                       )
@@ -367,4 +457,5 @@ function CompanyData() {
     </div>
   );
 }
-export default CompanyData
+
+export default CompanyData;
